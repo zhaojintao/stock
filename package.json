@@ -1,0 +1,8 @@
+{
+    "family": "circle",
+    "name": "release",
+    "homepage": "http://huixisheng.github.io",
+    "devDependencies": {
+        "uglify-js": "*"
+      }
+}

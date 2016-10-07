@@ -1,0 +1,194 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>K线</title>
+<script type="text/javascript" src="all/kline.js"></script>
+
+<!-- <script type="text/javascript" src='utils/Util.js'></script> -->
+<!-- <script type="text/javascript" src='utils/GlobalFunction.js'></script> -->
+<!-- <script type="text/javascript" src='common/Painter.js'></script> -->
+<!-- <script type="text/javascript" src='common/xAxis.js'></script> -->
+<!-- <script type="text/javascript" src='common/yAxis.js'></script> -->
+<!-- <script type="text/javascript" src='common/Tip.js'></script> -->
+<!-- <script type="text/javascript" src='common/CrossLines.js'></script> -->
+<!-- <script type="text/javascript" src='common/Slider.js'></script> -->
+<!-- <script type="text/javascript" src='views/klineChart.js'></script> -->
+<!-- <script type="text/javascript" src='events/ChartEvent.js'></script> -->
+
+<style type="text/css">
+body {
+	margin: 0;
+	padding: 0;
+}
+</style>
+</head>
+<body>
+	<div id="debug"></div>
+	<div style="margin: 10px">
+		<canvas id="canvasKL" style="z-index: 2;">
+        <p>Hi,您的浏览器不支持html5，换个浏览器吧，比如google chrome，firefox</p>
+		</canvas>
+	</div>
+
+	<script type="text/javascript" src="all/kdata.js"></script>
+<!-- 	<script type="text/javascript" src='views/kline.js'></script> -->
+<!-- 	<script type="text/javascript" src='vo/klData.js'></script> -->
+	
+	<script type="text/javascript">
+		var canvas = $id('canvasKL');
+		var width_parent = canvas.parentNode.offsetWidth;
+
+		canvas.style.width = canvas_width + "px";
+		canvas.style.height = canvas_height + "px";
+		canvas.height = canvas_height * devicePixelRatio;
+		canvas.width = canvas_width * devicePixelRatio;
+		margin_left = 40.5;
+		margin_top = 0.5;
+		var chart_width = canvas_width - margin_left;
+		var xAxisHeight = 20;
+		/**
+		 * 图表区域
+		 * 
+		 * @type
+		 */
+		var _chartRegion = {
+			x : margin_left * devicePixelRatio,
+			y : margin_top * devicePixelRatio,
+			width : chart_width * devicePixelRatio,
+			height : chart_height * devicePixelRatio
+		};
+
+		/**
+		 * 成交量
+		 * 
+		 * @type
+		 */
+		var _volumeRegion = {
+			x : margin_left * devicePixelRatio,
+			y : (margin_top + chart_height) * devicePixelRatio,
+			height : volumeHeight * devicePixelRatio,
+			width : chart_width * devicePixelRatio
+		};
+
+		var dataOptions = {
+			code : '600000',
+			type : 'stock_day',//'stock_day', /* 日K线 */
+			ktype : {},
+			fq : '', /* 是否复权， 为空不复权 （b 向后， q向前 */
+			time : '2013,2014',
+			updateTip : function(obj) {
+				console.log(obj);
+				document.getElementById('debug').innerHTML = JSON
+						.stringify(obj);
+			}
+		};
+		var kChartOptions = {
+			leftTipSize : {
+				width : 40 * devicePixelRatio,
+				height : 18 * devicePixelRatio
+			},
+			rightTipSize : {
+				width : 40 * devicePixelRatio,
+				height : 18 * devicePixelRatio
+			},
+			bottomTipSize : {
+				width : 70 * devicePixelRatio,
+				height : 18 * devicePixelRatio
+			},
+			backgroundColor : '#fff',
+			riseColor : RiseColor,
+			fallColor : FallColor,
+			normalColor : 'black',
+			// 主图区域
+			region : _chartRegion,
+			// 柱子宽度
+			barWidth : 7 * devicePixelRatio,
+			// 两根柱子之间间隔宽度
+			spaceWidth : 3 * devicePixelRatio,
+			// 水平线数量
+			horizontalLineCount : 3,
+			// 垂直线数量
+			verticalLineCount : 4,
+			lineStyle : 'dashed',// 'solid',
+			borderColor : 'gray',
+			splitLineColor : '#eeeeee',
+			lineWidth : lineWidth,
+			MAs : [ {
+				color : 'rgb(255,70,251)',
+				daysCount : 5
+			}, {
+				color : 'rgb(227,150,34)',
+				daysCount : 10
+			}, {
+				color : 'rgb(53,71,107)',
+				daysCount : 20
+			} ],
+			yAxis : {
+				font : font,
+				color : 'black',
+				align : 'right',
+				fontHeight : 7,
+				textBaseline : 'top'
+			},
+			xAxis : {
+				font : font,
+				color : 'black',
+				align : 'left',
+				fontHeight : 8,
+				textBaseline : 'top',
+				scalerCount : 5,
+				height : xAxisHeight
+			},
+			volume : {
+				region : _volumeRegion,
+				lineWidth : lineWidth,
+				horizontalLineCount : 1,
+				lineStyle : 'dashed',
+				yAxis : {
+					font : font,
+					color : 'black',
+					align : 'right',
+					fontHeight : 8,
+					textBaseline : 'top'
+				}
+			},
+			priceLine : {
+				region : {
+					x : margin_left * devicePixelRatio,
+					y : _volumeRegion.y + _volumeRegion.height + xAxisHeight,
+					height : priceHeight * devicePixelRatio,
+					width : chart_width * devicePixelRatio
+				},
+				verticalLineCount : 4,
+				horizontalLineCount : 1,
+				lineStyle : 'dashed',
+				borderColor : '#cccccc',
+				splitLineColor : '#eeeeee',
+				fillColor : '#a0d4f6',
+				alpha : 1,
+				yAxis : {
+					font : font,
+					color : 'black',
+					align : 'right',
+					fontHeight : 8,
+					textBaseline : 'top'
+				}
+			},
+			slider : {
+				bar : {
+					width : 20,
+					height : 35,
+					borderColor : 'black',
+					fillColor : 'lightgray'
+				},
+				minBarDistance : 20
+			}
+		};
+		var kData = new klData(dataOptions, kChartOptions);
+		kData.init();
+	</script>
+</body>
+</html>

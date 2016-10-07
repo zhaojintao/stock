@@ -1,0 +1,256 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta charset="utf-8" />
+<title>分时</title>
+<script type="text/javascript" src='utils/Util.js'></script>
+<script type="text/javascript" src='utils/GlobalFunction.js'></script>
+<script type="text/javascript" src='common/Painter.js'></script>
+<script type="text/javascript" src='common/LinePainter.js'></script>
+<script type="text/javascript" src='common/VolumePainter.js'></script>
+<script type="text/javascript" src='common/xAxis.js'></script>
+<script type="text/javascript" src='common/yAxis.js'></script>
+<script type="text/javascript" src='common/Tip.js'></script>
+<script type="text/javascript" src='common/CrossLines.js'></script>
+<script type="text/javascript" src='common/Slider.js'></script>
+<script type="text/javascript" src='views/FenshiChart.js'></script>
+<script type="text/javascript" src='events/ChartEvent.js'></script>
+
+<style type="text/css">
+body {
+	margin: 0;
+	padding: 0;
+}
+</style>
+</head>
+<body>
+	<div id="debug">当前价格：</div>
+	<div style="margin: 10px">
+		<canvas id="canvasFS" style="z-index: 2;">
+        <p>哇哦,您的浏览器不支持html5，太out了吧~换个浏览器吧，比如chrome，firefox</p>
+		</canvas>
+	</div>
+
+	<script type="text/javascript" src='views/Fenshi.js'></script>
+	<script type="text/javascript" src='vo/FenshiData.js'></script>
+
+
+	<script type="text/javascript">
+		var canvas = $id('canvasFS');
+		var width_parent = canvas.parentNode.offsetWidth;
+
+		canvas.style.width = canvas_width + "px";
+		canvas.style.height = canvas_height + "px";
+		canvas.height = canvas_height * devicePixelRatio;
+		canvas.width = canvas_width * devicePixelRatio;
+
+		var chart_width = canvas_width - 2 * margin_left;
+		var xAxisHeight = 20;
+		/**
+		 * 图表区域
+		 * 
+		 * @type
+		 */
+		var _chartRegion = {
+			x : margin_left * devicePixelRatio,
+			y : margin_top * devicePixelRatio,
+			width : chart_width * devicePixelRatio,
+			height : chart_height * devicePixelRatio
+		};
+
+		/**
+		 * 成交量
+		 * 
+		 * @type
+		 */
+		var _volumeRegion = {
+			x : margin_left * devicePixelRatio,
+			y : (_chartRegion.y + margin_top + chart_height + xAxisHeight)
+					* devicePixelRatio,
+			height : volumeHeight * devicePixelRatio,
+			width : chart_width * devicePixelRatio
+		};
+
+		/**
+		 * 价格线
+		 * 
+		 * @type
+		 */
+		var _priceRegion = {
+			x : margin_left * devicePixelRatio,
+			y : (_chartRegion.y + margin_top + chart_height + 2 * xAxisHeight + volumeHeight)
+					* devicePixelRatio,
+			height : priceHeight * devicePixelRatio,
+			width : chart_width * devicePixelRatio
+		};
+		/**
+		info 数据类型: 格式 {1}_{2}_{3}
+		{1}  vm 当日分时数据
+		     vh 历史分时数据
+		     vft 历史资金推送数据
+		     vf 历史资金数据
+		     k k线数据
+		     kt k线实时推送数据
+		     va 个股历史收盘价
+		{2}  sh 上证
+		     sz 深证
+		     fd 基金
+		     qh 期货市场
+		     gwsp 国外商品
+		     bk 同花顺板块     
+		{3} 代码	
+		fq 是否复权 默认 为空不复权 （b 向后， q 向前）
+		 */
+		var dataOptions = {
+			info : 'vm_sz_300033',
+			starttime : '0930', // 09:30 开盘时间
+			fq : '',
+			duration : 60 * 1000,
+			updateTip : function(obj) {
+				console.log(obj);
+				document.getElementById('debug').innerHTML = JSON
+						.stringify(obj);
+			}
+		};
+		var fsOptions = {
+			leftTipSize : {
+				width : 40 * devicePixelRatio,
+				height : 18 * devicePixelRatio
+			},
+			rightTipSize : {
+				width : 40 * devicePixelRatio,
+				height : 18 * devicePixelRatio
+			},
+			bottomTipSize : {
+				width : 70 * devicePixelRatio,
+				height : 18 * devicePixelRatio
+			},
+			backgroundColor : '#fff',
+			riseColor : RiseColor,
+			fallColor : FallColor,
+			normalColor : 'black',
+			needPaintAvgPriceLine : true,
+			minsChart : {
+				totalDotsCount : 241,
+				region : _chartRegion,
+				priceLineColor : 'rgb(48, 133, 213)',
+				avgPriceLineColor : 'rgb(241, 140, 79)',
+				middleLineColor : 'red',
+				middleLineWidth : lineWidth * 2,
+				otherLineWidth : lineWidth,
+				otherLineStyle : 'lightgray',
+				borderColor : 'gray',
+				horizontalLineCount : 5,
+				verticalLineCount : 3,
+				lineStyle : 'dashed',// 'solid',
+				yScalerLeft : {
+					font : '12px Arial',
+					region : {
+						x : 0.5,
+						y : _chartRegion.y,
+						width : _chartRegion.x,
+						height : _chartRegion.height
+					},
+					align : 'right',
+					fontHeight : 9,
+					textBaseline : 'top'
+				},
+				yScalerRight : {
+					font : '12px Arial',
+					region : {
+						x : _chartRegion.width + _chartRegion.x,
+						y : _chartRegion.y,
+						width : _chartRegion.x,
+						height : _chartRegion.height - 5
+					},
+					align : 'left',
+					fontHeight : 9,
+					textBaseline : 'top'
+				}
+			},
+			xScaler : {
+				textBaseline : 'top',
+				font : '12px Arial',
+				color : 'black',
+				region : {
+					x : _chartRegion.x,
+					y : _volumeRegion.y + _volumeRegion.height,
+					width : _chartRegion.width,
+					height : xAxisHeight
+				},
+				data : [ '09:30', '10:30', '11:30/13:00', '14:00', '15:00' ]
+			},
+			volume : {
+				region : _volumeRegion,
+				totalDotsCount : 241,
+				borderColor : 'gray',
+				splitLineColor : 'lightgray',
+				splitLineWidth : lineWidth,
+				verticalLineCount : 3,
+				yScalerLeft : {
+					font : '12px Arial',
+					region : {
+						x : 0.5,
+						y : _volumeRegion.y,
+						width : _chartRegion.x,
+						height : _volumeRegion.height
+					},
+					color : 'black',
+					align : 'right',
+					fontHeight : 12,
+					textBaseline : 'top'
+				},
+				yScalerRight : {
+					font : '12px Arial',
+					region : {
+						x : _chartRegion.width + _chartRegion.x,
+						y : _volumeRegion.y,
+						width : _chartRegion.x,
+						height : _volumeRegion.height
+					},
+					color : 'black',
+					align : 'left',
+					fontHeight : 12,
+					textBaseline : 'top'
+				}
+			},
+			priceLine : {
+				region : {
+					x : margin_left * devicePixelRatio,
+					y : _volumeRegion.y + _volumeRegion.height + xAxisHeight,
+					height : priceHeight * devicePixelRatio,
+					width : chart_width * devicePixelRatio
+				},
+				verticalLineCount : 4,
+				horizontalLineCount : 1,
+				lineWidth : lineWidth,
+				lineStyle : 'dashed',
+				lineColor : 'rgb(204, 204, 204)',
+				fillColor : '#a0d4f6',
+				alpha : 1,
+				yAxis : {
+					font : font + 'px Arial',
+					color : 'black',
+					align : 'right',
+					fontHeight : font,
+					textBaseline : 'top'
+				}
+			},
+			slider : {
+				bar : {
+					width : 20,
+					height : 35,
+					borderColor : 'black',
+					fillColor : 'lightgray'
+				},
+				minBarDistance : 20
+			}
+		};
+		var fenshiData = new FenshiData(dataOptions, fsOptions);
+		fenshiData.init();
+	</script>
+</body>
+</html>

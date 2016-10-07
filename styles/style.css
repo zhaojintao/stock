@@ -1,0 +1,127 @@
+@CHARSET "UTF-8";
+* {
+	padding-bottom: 0px;
+	margin: 0px;
+	padding-left: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+}
+
+BODY {
+	padding-left: 10px;
+	padding-top: 10px;
+}
+
+.stocktab {
+	width: 122px;
+	padding-left: 10px;
+	float: left;
+}
+
+#curprice {
+	width: 140px;
+	height: 40px;
+	text-align: center;
+	padding-left: 0px;
+	border-bottom: #FF0000 0px solid;
+	border-left: #FF0000 0px solid;
+	border-top: #FF0000 0px solid;
+	border-right: #FF0000 0px solid;
+	font-size: 26px;
+}
+
+#priceChange {
+	width: 110px;
+	height: 20px;
+}
+#zhangdie {
+	display:block;
+	width: 35px;
+	float:left;
+	text-align : left;
+	font-size: 12px;
+}
+#zhangdiefu {
+	display:block;
+	width: 65px;
+	float:right;
+	text-align : right;
+	font-size: 12px;
+}
+
+.tab {
+	border-bottom: lightgray 1px solid;
+	border-left: lightgray 1px solid;
+	border-top: lightgray 1px solid;
+	border-right: lightgray 1px solid;
+	border-radius: 5px;
+}
+
+.tab UL {
+	zoom: 1;
+	clear: both;
+}
+
+.tab UL:after {
+	display: block;
+	height: 0px;
+	visibility: hidden;
+	clear: both;
+	content: "";
+}
+
+.tab UL LI {
+	text-align: center;
+	line-height: 20px;
+	width: 60px;
+	display: inline;
+	background: #FF0000;
+	float: left;
+	height: 20px;
+	color: #fff;
+}
+
+.tab UL LI.on {
+	background: #fff;
+	color: #000;
+}
+
+.content {
+	padding-right: 0px;
+	paddint-top: 0px;
+	float: right;
+	width:170px;
+}
+
+.textkey {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	display: inline-block;
+	width: 30px;
+	font-size: 13px;
+}
+.param {
+	padding-top: 3px;
+	padding-bottom: 3px;
+	display: inline-block;
+	width: 70px;
+	font-size: 12px;
+	text-align:center;
+}
+
+.maValue {
+	padding-top: 3px;
+	padding-bottom: 3px;
+	display: inline-block;
+	width: 100px;
+	font-size: 12px;
+	text-align:center;
+}
+
+.textvalue {
+	padding-top: 10px;
+	padding-bottom: 10px;
+	display: inline-block;
+	width: 50px;
+	font-size: 13px;
+}

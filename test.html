@@ -1,0 +1,18 @@
+<html>
+<head>
+<meta name="GENERATOR" content="MSHTML 8.00.7600.16535">
+</head>
+<body>
+<div id="txt"></div>
+	<script type="text/javascript">
+	var script = document.createElement('script');
+	script.src = "http://qd.10jqka.com.cn/quote.php?type=stock&cate=history&name=real&code=300033&start=20140101&return=json&callback=jsonpCallback";
+	function jsonpCallback(json){
+		console.log(json);
+		document.getElementById('txt').innerHTML = json.data[5]["8"] ;// JSON.stringify(json.data[5]["6"]);
+	}
+
+	document.body.appendChild(script);
+	</script>
+</body>
+</html>

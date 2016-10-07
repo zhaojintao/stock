@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>K线</title>
+<script type="text/javascript" src="utils/util.js"></script>
+<script type="text/javascript" src="utils/GlobalFunction.js"></script>
+<script type="text/javascript" src="common/Painter.js"></script>
+<script type="text/javascript" src="common/xAxis.js"></script>
+<script type="text/javascript" src="common/yAxis.js"></script>
+<script type="text/javascript" src="common/Slider.js"></script>
+<script type="text/javascript" src="common/CrossLines.js"></script>
+<script type="text/javascript" src="common/Tip.js"></script>
+<script type="text/javascript" src="events/ChartEvent.js"></script>
+<style type="text/css">
+body {
+	margin: 0;
+	padding: 0;
+}
+</style>
+</head>
+<body>
+	<div id="debug"></div>
+	<div style="margin: 10px">
+		<canvas id="canvasKL" style="z-index: 2;">
+        <p>Hi,您的浏览器不支持html5，换个浏览器吧，比如google chrome，firefox</p>
+		</canvas>
+	</div>
+	
+	<script type="text/javascript" src="views/klineChart.js"></script>
+	<script type="text/javascript" src="views/kline.js"></script>
+	<script type="text/javascript" src="vo/klData.js"></script>
+	
+	<script type="text/javascript">
+		var dataOptions = {
+			code : '600000',
+			type : 'stock_day',//'stock_day', /* 日K线 */
+			ktype : {},
+			fq : '', /* 是否复权， 为空不复权 （b 向后， q向前 */
+			time : '2013,2014'
+		};
+		var kData = new klData(dataOptions);
+		kData.init();
+	</script>
+</body>
+</html>
